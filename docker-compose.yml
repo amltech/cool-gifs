@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  reverse-proxy:
+    image: traefik
+    command: --api --docker
+    ports: 
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  backend:
+    image: amltech/cool-gifs-api
+    command: gunicorn cool_gifs.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - static_volume:/usr/src/app/static
+      - media_volume:/usr/src/app/media
+    env_file: .env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:11.2-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file: .env.db
+
+  nginx:
+    image: nginx:1.15.12-alpine 
+    depends_on:
+      - backend
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - static_volume:/usr/src/app/static
+      - media_volume:/usr/src/app/media
+    labels:
+      - "traefik.frontend.rule=Host:api.example.com"
+
+  frontend:
+    image: amltech/cool-gifs-frontend
+    env_file: .env.frontend
+    labels:
+      - "traefik.frontend.rule=Host:gifs.example.com"
+
+    
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+  
