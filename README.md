@@ -9,6 +9,7 @@
      1. Edit to suit your environment.
      1. Change `SECRET_KEY` to be something unique
      1. Change `CORS_ORIGIN` to be the url to where your frontend will be accessed
+     1. Change `API_URL` to be the url where this api will be accessed from
      1. Change `SQL_USER` and `SQL_PASSWORD` to match the values in `.env.db`
 1. Create frontend .env.frontend` file
      1. Copy `.env.frontend.example` to `.env.frontend`
